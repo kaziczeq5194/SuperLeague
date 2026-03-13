@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { getConnectionStatus, refreshConnection, getCurrentSummoner } from '../lib/lcu-api';
-import type { ConnectionStatus, Summoner } from '../lib/types';
+import type { Summoner } from '../lib/types';
 
 export function useLcu(pollInterval = 5000) {
-  const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ connected: false });
+  const [connected, setConnected] = useState(false);
   const [summoner, setSummoner] = useState<Summoner | null>(null);
   const [loading, setLoading] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -11,7 +11,7 @@ export function useLcu(pollInterval = 5000) {
   const checkConnection = useCallback(async () => {
     try {
       const status = await getConnectionStatus();
-      setConnectionStatus(status);
+      setConnected(status.connected);
 
       if (status.connected) {
         const summonerData = await getCurrentSummoner();
@@ -20,7 +20,7 @@ export function useLcu(pollInterval = 5000) {
         setSummoner(null);
       }
     } catch {
-      setConnectionStatus({ connected: false });
+      setConnected(false);
       setSummoner(null);
     } finally {
       setLoading(false);
@@ -31,13 +31,13 @@ export function useLcu(pollInterval = 5000) {
     setLoading(true);
     try {
       const status = await refreshConnection();
-      setConnectionStatus(status);
+      setConnected(status.connected);
       if (status.connected) {
         const summonerData = await getCurrentSummoner();
         setSummoner(summonerData);
       }
     } catch {
-      setConnectionStatus({ connected: false });
+      setConnected(false);
     } finally {
       setLoading(false);
     }
@@ -51,5 +51,5 @@ export function useLcu(pollInterval = 5000) {
     };
   }, [checkConnection, pollInterval]);
 
-  return { connectionStatus, summoner, loading, refresh };
+  return { connected, summoner, loading, refresh };
 }

@@ -227,6 +227,78 @@ export function getItemIconUrl(itemId: number): string {
   return `https://ddragon.leagueoflegends.com/cdn/${DDRAGON_VERSION}/img/item/${itemId}.png`;
 }
 
+export function getSkinSplashUrl(championId: number, skinId: number): string {
+  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-splashes/${championId}/${skinId}.jpg`;
+}
+
+export function getSkinTileUrl(championId: number, skinId: number): string {
+  return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-tiles/${championId}/${skinId}.jpg`;
+}
+
 export function getSummonerSpellIconUrl(spellId: number): string {
   return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/data/spells/icons2d/summonerflash.png`;
+}
+
+// ── Ranked / LP ──
+
+export async function getRankedStats(): Promise<Record<string, unknown>> {
+  try {
+    return await invoke('get_ranked_stats');
+  } catch {
+    return {};
+  }
+}
+
+export async function getRecentMatches(): Promise<Record<string, unknown>> {
+  try {
+    return await invoke('get_recent_matches');
+  } catch {
+    return {};
+  }
+}
+
+// ── Champions & Builds ──
+
+export async function getAllChampions(): Promise<unknown[]> {
+  try {
+    return await invoke('get_all_champions');
+  } catch {
+    return [];
+  }
+}
+
+export async function getChampionBuilds(championId: number): Promise<unknown> {
+  try {
+    return await invoke('get_champion_builds', { championId });
+  } catch {
+    return null;
+  }
+}
+
+// ── Summoner Lookup (Team Builder) ──
+
+export async function getSummonerByName(name: string): Promise<unknown> {
+  try {
+    return await invoke('get_summoner_by_name', { name });
+  } catch {
+    return null;
+  }
+}
+
+export async function getSummonerChallenges(puuid: string): Promise<unknown> {
+  try {
+    return await invoke('get_summoner_challenges', { puuid });
+  } catch {
+    return null;
+  }
+}
+
+// ── Challenge Summary (convenience) ──
+
+export async function getChallengeSummary(): Promise<Record<string, unknown>> {
+  try {
+    return await invoke('get_challenges_summary');
+  } catch {
+    return {};
+  }
 }

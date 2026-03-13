@@ -330,3 +330,51 @@ pub async fn send_discord_webhook(webhook_url: String, content: String) -> Resul
         .map_err(|e| e.to_string())?;
     Ok(res.status().is_success())
 }
+
+// ── Ranked Stats (LP Tracker) ────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn get_ranked_stats() -> Result<Value, String> {
+    lcu_get("/lol-ranked/v1/current-ranked-stats").await
+}
+
+#[tauri::command]
+pub async fn get_recent_matches() -> Result<Value, String> {
+    lcu_get("/lol-match-history/v1/products/lol/current-summoner/matches").await
+}
+
+// ── Champions & Builds ───────────────────────────────────────────────────────
+
+#[tauri::command]
+pub async fn get_all_champions() -> Result<Value, String> {
+    lcu_get("/lol-champions/v1/owned-champions-minimal").await
+}
+
+#[tauri::command]
+pub async fn get_champion_builds(champion_id: i64) -> Result<Value, String> {
+    lcu_get_required(&format!(
+        "/lol-champions/v1/champions/{}/recommended-builds",
+        champion_id
+    ))
+    .await
+}
+
+// ── Summoner Lookup (for Team Builder) ───────────────────────────────────────
+
+#[tauri::command]
+pub async fn get_summoner_by_name(name: String) -> Result<Value, String> {
+    lcu_get_required(&format!(
+        "/lol-summoner/v1/summoners?name={}",
+        urlencoding::encode(&name)
+    ))
+    .await
+}
+
+#[tauri::command]
+pub async fn get_summoner_challenges(puuid: String) -> Result<Value, String> {
+    lcu_get_required(&format!(
+        "/lol-challenges/v1/summary-player-data/{}",
+        puuid
+    ))
+    .await
+}

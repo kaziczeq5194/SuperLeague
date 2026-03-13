@@ -68,6 +68,15 @@ pub fn run() {
             commands::add_account,
             // Discord
             commands::send_discord_webhook,
+            // Ranked / LP
+            commands::get_ranked_stats,
+            commands::get_recent_matches,
+            // Champions & Builds
+            commands::get_all_champions,
+            commands::get_champion_builds,
+            // Summoner Lookup
+            commands::get_summoner_by_name,
+            commands::get_summoner_challenges,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
