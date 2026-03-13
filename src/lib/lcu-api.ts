@@ -74,7 +74,7 @@ export async function getChallengesSummary(): Promise<Record<string, any>> {
 // ── Champion Mastery ──
 
 export async function getChampionMasteries(): Promise<any[]> {
-  const raw = await lcuGet('/lol-champion-mastery/v1/local-player/champion-mastery/top?count=200');
+  const raw = await lcuGet('/lol-champion-mastery/v1/local-player/champion-mastery');
   return toArray(raw);
 }
 
