@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  :root {
+    --background: 216 84% 4%;
+    --foreground: 40 55% 92%;
+    --card: 210 20% 13%;
+    --card-foreground: 40 55% 92%;
+    --popover: 210 20% 13%;
+    --popover-foreground: 40 55% 92%;
+    --primary: 40 55% 51%;
+    --primary-foreground: 216 84% 4%;
+    --secondary: 174 90% 41%;
+    --secondary-foreground: 216 84% 4%;
+    --muted: 210 10% 25%;
+    --muted-foreground: 39 6% 60%;
+    --accent: 192 80% 36%;
+    --accent-foreground: 40 55% 92%;
+    --destructive: 352 78% 56%;
+    --destructive-foreground: 40 55% 92%;
+    --border: 35 53% 31%;
+    --input: 210 20% 18%;
+    --ring: 40 55% 51%;
+    --radius: 0.375rem;
+  }
+
+  * {
+    @apply border-league-border-dark;
+  }
+
+  body {
+    @apply bg-league-bg-darkest text-league-text-primary font-sans antialiased;
+    overflow: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A1428;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #463714;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #785A28;
+  }
+}
+
+@layer components {
+  /* League-styled card */
+  .league-card {
+    @apply bg-league-surface border border-league-border-dark rounded-league p-4
+           transition-all duration-200 hover:border-league-gold-dark hover:shadow-league;
+  }
+
+  /* Gold bordered card */
+  .league-card-gold {
+    @apply league-card border-league-gold/30;
+  }
+
+  /* Progress bar */
+  .league-progress {
+    @apply h-2 bg-league-bg-dark rounded-full overflow-hidden;
+  }
+
+  .league-progress-bar {
+    @apply h-full bg-gold-gradient rounded-full transition-all duration-500 ease-out;
+  }
+
+  /* Sidebar nav item */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-league text-league-text-secondary
+           transition-all duration-200 cursor-pointer hover:bg-league-surface-hover
+           hover:text-league-text-primary;
+  }
+
+  .nav-item.active {
+    @apply bg-league-blue-muted text-league-blue border-l-2 border-league-blue;
+  }
+
+  /* Badge */
+  .league-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  /* Button styles */
+  .btn-primary {
+    @apply bg-league-gold text-league-bg-darkest font-semibold px-4 py-2 rounded-league
+           transition-all duration-200 hover:bg-league-gold-light hover:shadow-league
+           active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply bg-league-blue-muted text-league-blue border border-league-blue/30 px-4 py-2
+           rounded-league transition-all duration-200 hover:bg-league-blue/10
+           hover:border-league-blue/50;
+  }
+
+  .btn-ghost {
+    @apply text-league-text-secondary px-4 py-2 rounded-league transition-all duration-200
+           hover:bg-league-surface-hover hover:text-league-text-primary;
+  }
+
+  /* Input styles */
+  .league-input {
+    @apply bg-league-bg-dark border border-league-border-dark rounded-league px-3 py-2
+           text-league-text-primary placeholder:text-league-text-muted
+           focus:outline-none focus:border-league-gold/50 focus:ring-1 focus:ring-league-gold/20
+           transition-all duration-200;
+  }
+
+  /* Search input with icon */
+  .league-search {
+    @apply league-input pl-10 w-full;
+  }
+
+  /* Tab styles */
+  .league-tab {
+    @apply px-4 py-2 text-sm font-medium text-league-text-secondary border-b-2 border-transparent
+           transition-all duration-200 cursor-pointer
+           hover:text-league-text-primary hover:border-league-gold/30;
+  }
+
+  .league-tab.active {
+    @apply text-league-gold border-league-gold;
+  }
+
+  /* Stat display */
+  .stat-card {
+    @apply league-card flex flex-col items-center justify-center text-center gap-1;
+  }
+
+  .stat-value {
+    @apply text-2xl font-bold text-league-gold;
+  }
+
+  .stat-label {
+    @apply text-xs text-league-text-secondary uppercase tracking-wider;
+  }
+
+  /* Champion icon styling */
+  .champion-icon {
+    @apply w-12 h-12 rounded-full border-2 border-league-border-dark
+           transition-all duration-200 hover:border-league-gold hover:shadow-league;
+  }
+
+  /* Mastery bar (vertical) */
+  .mastery-bar {
+    @apply relative w-10 rounded-t-lg overflow-hidden transition-all duration-700 ease-out;
+    background: linear-gradient(180deg, #C89B3C 0%, #0397AB 50%, #0A1428 100%);
+  }
+
+  /* Connection indicator */
+  .connection-dot {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .connection-dot.connected {
+    @apply bg-league-success animate-pulse;
+  }
+
+  .connection-dot.disconnected {
+    @apply bg-league-danger;
+  }
+
+  /* Hover card */
+  .league-hover-card {
+    @apply bg-league-surface border border-league-border-dark rounded-league p-4
+           shadow-league animate-fade-in;
+  }
+
+  /* Section title */
+  .section-title {
+    @apply text-lg font-semibold text-league-gold-light mb-4 flex items-center gap-2;
+  }
+
+  /* Grid layouts */
+  .champion-grid {
+    @apply grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-2;
+  }
+
+  .challenge-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent bg-gold-gradient;
+  }
+
+  .text-gradient-blue {
+    @apply bg-clip-text text-transparent bg-blue-gradient;
+  }
+
+  .border-glow-gold {
+    box-shadow: 0 0 10px rgba(200, 155, 60, 0.3), inset 0 0 10px rgba(200, 155, 60, 0.1);
+  }
+
+  .border-glow-blue {
+    box-shadow: 0 0 10px rgba(10, 200, 185, 0.3), inset 0 0 10px rgba(10, 200, 185, 0.1);
+  }
+}
