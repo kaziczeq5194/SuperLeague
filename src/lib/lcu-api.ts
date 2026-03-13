@@ -17,8 +17,10 @@ async function lcuGet(endpoint: string): Promise<any> {
     if (res.status >= 200 && res.status < 300 && res.body) {
       return JSON.parse(res.body);
     }
+    console.error(`[LCU] ${endpoint} → ${res.status}:`, res.body?.slice(0, 200));
     return null;
-  } catch {
+  } catch (e) {
+    console.error(`[LCU] ${endpoint} invoke error:`, e);
     return null;
   }
 }
