@@ -92,8 +92,55 @@ export async function getLobbyMembers(): Promise<any[]> {
 // ── Eternals ──
 
 export async function getEternals(): Promise<any[]> {
-  const raw = await lcuGet('/lol-statstones/v2/player-statstones-self');
+  // Try to get detailed eternal stats with values
+  const detailedEndpoints = [
+    '/lol-statstones/v1/vignette/local-player',
+    '/lol-statstones/v2/player-statstones-self',
+  ];
+
+  for (const endpoint of detailedEndpoints) {
+    try {
+      const res: LcuResponse = await invoke('lcu_request', {
+        request: { method: 'GET', endpoint },
+      });
+      if (res.status >= 200 && res.status < 300 && res.body) {
+        const data = JSON.parse(res.body);
+        console.log(`[Eternals] Found detailed data at ${endpoint}:`, data);
+        return toArray(data);
+      }
+    } catch (e) {
+      // Continue to next endpoint
+    }
+  }
+
+  // Fallback to summary endpoint
+  const raw = await lcuGet('/lol-statstones/v2/player-summary-self');
   return toArray(raw);
+}
+
+export async function getChampionEternals(championId: number): Promise<any> {
+  // Try multiple endpoints for detailed per-champion eternal stats
+  const endpoints = [
+    `/lol-statstones/v1/vignette/${championId}`,
+    `/lol-statstones/v2/player-statstones-self/${championId}`,
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const res: LcuResponse = await invoke('lcu_request', {
+        request: { method: 'GET', endpoint },
+      });
+      if (res.status >= 200 && res.status < 300 && res.body) {
+        const data = JSON.parse(res.body);
+        console.log(`[Eternals] Fetched champion ${championId} details from ${endpoint}:`, data);
+        return data;
+      }
+    } catch (e) {
+      // Silently continue
+    }
+  }
+
+  return null;
 }
 
 // ── Skins ──
