@@ -23,7 +23,9 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
-    host: host || false,
+    // Force a deterministic loopback interface on Windows to avoid
+    // localhost IPv4/IPv6 resolution mismatches in WebView.
+    host: host || '127.0.0.1',
     hmr: host
       ? {
           protocol: "ws",
