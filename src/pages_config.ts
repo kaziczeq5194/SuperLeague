@@ -1,6 +1,6 @@
 import {
   Home, Users, Trophy, Star, Swords, Flame, Palette,
-  Wrench, Globe, UserPen, Bug, Settings, UserCircle,
+  Wrench, Globe, UserPen, Bug, Settings, UserCircle, Shuffle,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 
@@ -12,6 +12,7 @@ import ChampionBreakdown from '@/pages/champion';
 import Eternals from '@/pages/eternals';
 import Skins from '@/pages/skins';
 import Builds from '@/pages/builds';
+import Randomizer from '@/pages/randomizer';
 import Teams from '@/pages/teams';
 import Profile from '@/pages/profile';
 import Accounts from '@/pages/accounts';
@@ -74,8 +75,14 @@ export const pages: Record<string, PageConfig> = {
     component: Builds,
     description: 'Champion build recommendations',
   },
+  randomizer: {
+    title: 'Randomizer',
+    icon: Shuffle,
+    component: Randomizer,
+    description: 'Random champion, runes, spells & builds',
+  },
   teams: {
-    title: 'Teams',
+    title: 'Regions',
     icon: Globe,
     component: Teams,
     description: 'Region team builder',

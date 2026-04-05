@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Trophy, Swords, Flame, Star,
   Palette, Wrench, Globe, UserPen, Bug, Settings, UserCircle,
-  RefreshCw, WifiOff, Copy, Check,
+  RefreshCw, WifiOff, Copy, Check, Shuffle,
 } from 'lucide-react';
 import { useLcu } from './hooks/useLcu';
 import { pages } from './pages_config';
@@ -17,16 +17,15 @@ const NAV_ITEMS: { key: PageKey; icon: React.ElementType; label: string; group: 
   { key: 'mastery',    icon: Flame,            label: 'Mastery',      group: 'Progress' },
   { key: 'champion',   icon: Swords,           label: 'Champion',     group: 'Progress' },
   { key: 'eternals',   icon: Star,             label: 'Eternals',     group: 'Progress' },
-  { key: 'skins',      icon: Palette,          label: 'Skins',        group: 'Collection' },
-  { key: 'builds',     icon: Wrench,           label: 'Builds',       group: 'Collection' },
-  { key: 'teams',      icon: Globe,            label: 'Teams',        group: 'Social' },
-  { key: 'profile',    icon: UserPen,          label: 'Profile',      group: 'Social' },
-  { key: 'accounts',   icon: UserCircle,       label: 'Accounts',     group: 'Social' },
+  { key: 'randomizer', icon: Shuffle,          label: 'Randomizer',   group: 'Fun Tools' },
+  { key: 'teams',      icon: Globe,            label: 'Regions',      group: 'Community' },
+  { key: 'profile',    icon: UserPen,          label: 'Profile',      group: 'Community' },
+  { key: 'accounts',   icon: UserCircle,       label: 'Accounts',     group: 'Community' },
   { key: 'debug',      icon: Bug,              label: 'Debug',        group: 'Tools' },
   { key: 'settings',   icon: Settings,         label: 'Settings',     group: 'Tools' },
 ];
 
-const GROUPS = ['Overview', 'Progress', 'Collection', 'Social', 'Tools'];
+const GROUPS = ['Overview', 'Progress', 'Community', 'Fun Tools', 'Tools'];
 
 const TIER_C: Record<string, string> = {
   IRON: '#6B6B6B', BRONZE: '#CD7F32', SILVER: '#C0C8D4', GOLD: '#C89B3C',
