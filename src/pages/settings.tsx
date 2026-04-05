@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Users, Webhook, Settings, RefreshCw, Trash2, Check, AlertTriangle } from 'lucide-react';
-import { getAccounts, switchAccount, testDiscordWebhook } from '@/lib/lcu-api';
-import type { Account, AppSettings } from '@/lib/types';
+import { Webhook, Settings, RefreshCw, Check, AlertTriangle } from 'lucide-react';
+import { testDiscordWebhook } from '@/lib/lcu-api';
+import type { AppSettings } from '@/lib/types';
 
 const DEFAULT_SETTINGS: AppSettings = {
   discordWebhookUrl: '',
@@ -12,7 +12,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   activeAccountId: null,
 };
 
-const SECTION_TABS = ['Accounts', 'Discord', 'General'] as const;
+const SECTION_TABS = ['General', 'Discord'] as const;
 type SectionTab = typeof SECTION_TABS[number];
 
 /* ── Toggle switch ── */
@@ -34,15 +34,13 @@ function Toggle({ on, onChange }: { on: boolean; onChange: () => void }) {
 }
 
 export default function SettingsPage() {
-  const [activeSection, setActiveSection] = useState<SectionTab>('Accounts');
-  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [activeSection, setActiveSection] = useState<SectionTab>('General');
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [webhookStatus, setWebhookStatus] = useState<'idle' | 'testing' | 'success' | 'error'>('idle');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    getAccounts().then(setAccounts);
     try {
       const stored = localStorage.getItem('superleague_settings');
       if (stored) setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(stored) });
@@ -66,12 +64,6 @@ export default function SettingsPage() {
     setTimeout(() => setWebhookStatus('idle'), 3000);
   };
 
-  const handleSwitchAccount = async (id: number) => {
-    await switchAccount(id);
-    setAccounts(accounts.map(a => ({ ...a, isActive: a.id === id })));
-    setSettings({ ...settings, activeAccountId: id });
-  };
-
   return (
     <div className="p-6 space-y-5 animate-slide-up">
       {/* Header */}
@@ -91,7 +83,6 @@ export default function SettingsPage() {
             onClick={() => setActiveSection(tab)}
             className={`tab flex items-center gap-1.5 ${activeSection === tab ? 'active' : ''}`}
           >
-            {tab === 'Accounts' && <Users size={13} />}
             {tab === 'Discord' && <Webhook size={13} />}
             {tab === 'General' && <Settings size={13} />}
             {tab}
@@ -99,48 +90,60 @@ export default function SettingsPage() {
         ))}
       </div>
 
-      {/* ── Accounts ── */}
-      {activeSection === 'Accounts' && (
-        <div className="space-y-3">
-          <p className="text-xs text-ink-muted">
-            {accounts.length > 0
-              ? `${accounts.length} account${accounts.length !== 1 ? 's' : ''} tracked`
-              : 'Accounts are auto-detected when you log into League.'}
-          </p>
-
-          {accounts.length === 0 ? (
-            <div className="card p-8 text-center">
-              <Users size={32} className="mx-auto mb-3 text-ink-ghost opacity-30" />
-              <p className="text-sm text-ink-dim">No accounts detected</p>
-              <p className="text-xs text-ink-ghost mt-1">Launch League and connect to auto-detect</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {accounts.map((account) => (
-                <div key={account.id} className={`card p-3 flex items-center gap-3 ${account.isActive ? 'card-gold' : ''}`}>
-                  <div className="w-9 h-9 rounded-full bg-dark border border-white/[0.08] flex items-center justify-center text-sm font-bold text-gold flex-shrink-0">
-                    {account.summonerName.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-ink-bright truncate">{account.summonerName}</p>
-                    <p className="text-[10px] text-ink-ghost truncate">{account.region} · {account.puuid.slice(0, 12)}…</p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {account.isActive ? (
-                      <span className="badge-green text-[10px]">Active</span>
-                    ) : (
-                      <button onClick={() => handleSwitchAccount(account.id)} className="btn-ghost text-xs px-3 py-1">
-                        Switch
-                      </button>
-                    )}
-                    <button className="p-1.5 text-ink-ghost hover:text-ruby transition-colors rounded hover:bg-ruby/10">
-                      <Trash2 size={13} />
-                    </button>
-                  </div>
+      {/* ── General ── */}
+      {activeSection === 'General' && (
+        <div className="space-y-4">
+          <div className="card p-4 space-y-4">
+            <h3 className="text-sm font-semibold text-ink-bright">Connection</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-sm text-ink-bright">Auto-connect</p>
+                  <p className="text-xs text-ink-ghost">Detect and connect when League launches</p>
                 </div>
-              ))}
+                <Toggle on={settings.autoConnect} onChange={() => setSettings({ ...settings, autoConnect: !settings.autoConnect })} />
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-sm text-ink-bright">Refresh interval</p>
+                  <p className="text-xs text-ink-ghost">Polling frequency</p>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <input
+                    type="number"
+                    value={settings.refreshInterval}
+                    onChange={(e) => setSettings({ ...settings, refreshInterval: Number(e.target.value) })}
+                    className="input w-16 text-sm text-center"
+                    min={2} max={60}
+                  />
+                  <span className="text-xs text-ink-ghost">sec</span>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+
+          <div className="card p-4 space-y-4">
+            <h3 className="text-sm font-semibold text-ink-bright">Notifications</h3>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-sm text-ink-bright">Desktop notifications</p>
+                <p className="text-xs text-ink-ghost">Show system alerts for milestones</p>
+              </div>
+              <Toggle on={settings.showNotifications} onChange={() => setSettings({ ...settings, showNotifications: !settings.showNotifications })} />
+            </div>
+          </div>
+
+          <div className="card p-4 space-y-3">
+            <h3 className="text-sm font-semibold text-ink-bright">Data</h3>
+            <div className="flex gap-2">
+              <button className="btn-ghost text-sm">Export Data</button>
+              <button className="btn-danger text-sm">Clear History</button>
+            </div>
+            <p className="text-xs text-ink-ghost">
+              Data is stored locally in SQLite. Nothing is sent to external servers.
+            </p>
+          </div>
         </div>
       )}
 
@@ -196,63 +199,6 @@ export default function SettingsPage() {
                 </label>
               ))}
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* ── General ── */}
-      {activeSection === 'General' && (
-        <div className="space-y-4">
-          <div className="card p-4 space-y-4">
-            <h3 className="text-sm font-semibold text-ink-bright">Connection</h3>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-sm text-ink-bright">Auto-connect</p>
-                  <p className="text-xs text-ink-ghost">Detect and connect when League launches</p>
-                </div>
-                <Toggle on={settings.autoConnect} onChange={() => setSettings({ ...settings, autoConnect: !settings.autoConnect })} />
-              </div>
-
-              <div className="flex items-center justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-sm text-ink-bright">Refresh interval</p>
-                  <p className="text-xs text-ink-ghost">Polling frequency</p>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <input
-                    type="number"
-                    value={settings.refreshInterval}
-                    onChange={(e) => setSettings({ ...settings, refreshInterval: Number(e.target.value) })}
-                    className="input w-16 text-sm text-center"
-                    min={2} max={60}
-                  />
-                  <span className="text-xs text-ink-ghost">sec</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card p-4 space-y-4">
-            <h3 className="text-sm font-semibold text-ink-bright">Notifications</h3>
-            <div className="flex items-center justify-between gap-4">
-              <div className="min-w-0">
-                <p className="text-sm text-ink-bright">Desktop notifications</p>
-                <p className="text-xs text-ink-ghost">Show system alerts for milestones</p>
-              </div>
-              <Toggle on={settings.showNotifications} onChange={() => setSettings({ ...settings, showNotifications: !settings.showNotifications })} />
-            </div>
-          </div>
-
-          <div className="card p-4 space-y-3">
-            <h3 className="text-sm font-semibold text-ink-bright">Data</h3>
-            <div className="flex gap-2">
-              <button className="btn-ghost text-sm">Export Data</button>
-              <button className="btn-danger text-sm">Clear History</button>
-            </div>
-            <p className="text-xs text-ink-ghost">
-              Data is stored locally in SQLite. Nothing is sent to external servers.
-            </p>
           </div>
         </div>
       )}
