@@ -260,7 +260,7 @@ function TokenIcon({ challenge, size = 20 }: { challenge: ChallengeToken; size?:
 
 function TokenGrid({ title, challenges }: { title: string; challenges: ChallengeToken[] }) {
     return (
-        <div className="min-w-[120px]">
+        <div className="w-full">
             <h3 className="text-xs font-semibold text-ink-bright mb-1">
                 {title}
             </h3>
@@ -281,6 +281,11 @@ function PlayerRow({ player }: { player: LobbyPlayer }) {
     const displayName = player.gameName || player.summonerName || '???';
     const tagLine = player.tagLine || '';
     const hasRank = player.soloRank || player.flexRank;
+    
+    // Calculate if username is long (including tag)
+    const fullName = `${displayName}${tagLine ? `#${tagLine}` : ''}`;
+    const isLongUsername = fullName.length > 20;
+    
     return (
         <div className="flex items-center gap-4 py-2.5 border-b border-white/[0.04] last:border-b-0">
             {/* Avatar */}
@@ -296,9 +301,9 @@ function PlayerRow({ player }: { player: LobbyPlayer }) {
                 </div>
             </div>
 
-            {/* Name + Ranks */}
-            <div className="flex-shrink-0 min-w-[140px]">
-                <div className="text-xs font-bold text-ink-bright">
+            {/* Name + Ranks - flexible width based on username length */}
+            <div className={`flex-shrink-0 ${isLongUsername ? 'min-w-[180px]' : 'min-w-[140px]'}`}>
+                <div className="text-xs font-bold text-ink-bright truncate">
                     {displayName}
                     {tagLine && <span className="text-gold">#{tagLine}</span>}
                 </div>
@@ -312,11 +317,15 @@ function PlayerRow({ player }: { player: LobbyPlayer }) {
                 )}
             </div>
 
-            {/* Harmony Tokens */}
-            <TokenGrid title="Harmony" challenges={player.harmonyChallenges ?? []} />
+            {/* Harmony Tokens - flexible width */}
+            <div className="flex-1 min-w-[100px]">
+                <TokenGrid title="Harmony" challenges={player.harmonyChallenges ?? []} />
+            </div>
 
-            {/* Globetrotter Tokens */}
-            <TokenGrid title="Globetrotter" challenges={player.globetrotterChallenges ?? []} />
+            {/* Globetrotter Tokens - flexible width */}
+            <div className="flex-1 min-w-[100px]">
+                <TokenGrid title="Globetrotter" challenges={player.globetrotterChallenges ?? []} />
+            </div>
         </div>
     );
 }
