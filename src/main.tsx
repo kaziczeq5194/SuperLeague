@@ -29,7 +29,7 @@ class RootErrorBoundary extends React.Component<React.PropsWithChildren, ErrorBo
     if (this.state.hasError) {
       return (
         <div style={{
-          minHeight: '100vh',
+          minHeight: '100 h',
           display: 'grid',
           placeItems: 'center',
           background: '#0f172a',
