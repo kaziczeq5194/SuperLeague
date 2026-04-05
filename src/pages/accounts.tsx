@@ -1,7 +1,41 @@
 import { useEffect, useState } from 'react';
-import { UserCircle, Crown, Plus, ChevronRight } from 'lucide-react';
-import { getRankedStats, getProfileIconUrl } from '@/lib/lcu-api';
+import { UserCircle, Crown, Plus, ChevronRight, Star } from 'lucide-react';
+import { getRankedStats, getProfileIconUrl, getChampionMasteries, getChampionIconUrl } from '@/lib/lcu-api';
 import { useLcu } from '@/hooks/useLcu';
+
+// Champion name lookup from Community Dragon
+let championNames: Record<number, string> = {};
+async function loadChampionNames(): Promise<Record<number, string>> {
+  if (Object.keys(championNames).length > 0) return championNames;
+  try {
+    const res = await fetch('https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-summary.json');
+    const data = await res.json();
+    if (Array.isArray(data)) {
+      data.forEach((c: any) => {
+        if (c.id && c.id !== -1) championNames[c.id] = c.name ?? c.alias ?? `#${c.id}`;
+      });
+    }
+  } catch (e) {
+    console.error('Failed to load champion names:', e);
+  }
+  return championNames;
+}
+
+function getChampionName(championId: number): string {
+  return championNames[championId] ?? `Champion #${championId}`;
+}
+
+function fmtNum(n: number) {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
+
+const M_COLOR: Record<number, string> = {
+  1: '#5B5A56', 2: '#5B5A56', 3: '#5B5A56', 4: '#5B5A56',
+  5: '#E84057', 6: '#9D48E0', 7: '#C89B3C', 8: '#C89B3C',
+  9: '#C89B3C', 10: '#F4C874',
+};
 
 const TIER_ICON: Record<string, { bg: string; border: string; text: string }> = {
   IRON:        { bg: '#6B6B6B15', border: '#6B6B6B40', text: '#9AA4AF' },
@@ -43,11 +77,19 @@ function RankBadge({ tier, division, lp, wins, losses, queue }: {
 export default function Accounts() {
   const { summoner: currentSummoner } = useLcu();
   const [ranked, setRanked] = useState<any>(null);
+  const [masteries, setMasteries] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRankedStats().then((r) => {
+    loadChampionNames();
+    Promise.all([
+      getRankedStats(),
+      getChampionMasteries(),
+    ]).then(([r, m]) => {
       if (r && typeof r === 'object') setRanked(r);
+      if (Array.isArray(m) && m.length > 0) {
+        setMasteries(m.sort((a: any, b: any) => (b.championPoints ?? 0) - (a.championPoints ?? 0)));
+      }
       setLoading(false);
     });
   }, []);
@@ -55,6 +97,9 @@ export default function Accounts() {
   const queues = ranked?.queues ?? [];
   const soloQ = Array.isArray(queues) ? queues.find((q: any) => q.queueType === 'RANKED_SOLO_5x5') : null;
   const flexQ = Array.isArray(queues) ? queues.find((q: any) => q.queueType === 'RANKED_FLEX_SR') : null;
+
+  const totalMastery = masteries.reduce((sum, m) => sum + (m.championPoints ?? 0), 0);
+  const top3 = masteries.slice(0, 3);
 
   return (
     <div className="p-6 space-y-5 animate-slide-up">
@@ -66,14 +111,15 @@ export default function Accounts() {
           </h2>
         </div>
 
-        <div className="flex items-center gap-4 mb-4">
+        {/* Profile Header */}
+        <div className="flex items-start gap-4 mb-4">
           <img
             src={getProfileIconUrl(currentSummoner?.profileIconId ?? 29)}
             alt=""
-            className="w-14 h-14 rounded-lg border-2 border-gold/30 object-cover flex-shrink-0"
+            className="w-16 h-16 rounded-xl border-2 border-gold/30 object-cover flex-shrink-0"
             onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.3'; }}
           />
-          <div className="min-w-0">
+          <div className="flex-1 min-w-0">
             <p className="text-base font-bold text-ink-bright">
               {(currentSummoner as any)?.gameName ?? currentSummoner?.displayName ?? 'Unknown'}
             </p>
@@ -81,8 +127,61 @@ export default function Accounts() {
               {(currentSummoner as any)?.tagLine ? `#${(currentSummoner as any).tagLine}` : ''}
               {currentSummoner?.summonerLevel ? ` · Level ${currentSummoner.summonerLevel}` : ''}
             </p>
+            
+            {/* Total Mastery */}
+            <div className="flex items-center gap-2 mt-2">
+              <div className="px-2 py-1 rounded bg-gold/10 border border-gold/20">
+                <div className="flex items-center gap-1.5">
+                  <Star size={10} className="text-gold" />
+                  <span className="text-xs font-semibold text-gold tabular-nums">
+                    {fmtNum(totalMastery)} pts
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] text-ink-ghost">Total Mastery</span>
+            </div>
           </div>
         </div>
+
+        {/* Top 3 Champions */}
+        {!loading && top3.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-xs font-semibold text-ink-dim uppercase tracking-wider mb-2">Top Champions</h3>
+            <div className="flex gap-2">
+              {top3.map((m, idx) => {
+                const lvl = m.championLevel ?? 0;
+                const color = M_COLOR[Math.min(lvl, 10)] ?? '#5B5A56';
+                return (
+                  <div key={m.championId} className="flex-1 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.06]">
+                    <div className="flex items-center gap-2 mb-1">
+                      <img
+                        src={getChampionIconUrl(m.championId)}
+                        alt=""
+                        className="w-8 h-8 rounded object-cover border border-white/[0.08]"
+                        onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.3'; }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-semibold text-ink-bright truncate">
+                          {getChampionName(m.championId)}
+                        </p>
+                        <p className="text-[9px] text-ink-ghost">
+                          {fmtNum(m.championPoints ?? 0)} pts
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[8px] font-bold px-1.5 py-0.5 rounded" 
+                        style={{ background: `${color}15`, color }}>
+                        M{lvl}
+                      </span>
+                      <span className="text-[8px] text-ink-ghost">#{idx + 1}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Ranks */}
         {loading ? (
@@ -107,9 +206,9 @@ export default function Accounts() {
         )}
       </div>
 
-      {/* Saved Accounts (scrollable row) */}
+      {/* Other Accounts (scrollable row) */}
       <div>
-        <h2 className="text-sm font-semibold text-ink-bright mb-3">Saved Accounts</h2>
+        <h2 className="text-sm font-semibold text-ink-bright mb-3">Other Accounts</h2>
         <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
           {/* Placeholder for future saved accounts */}
           <div className="card p-4 min-w-[240px] flex-shrink-0 flex items-center gap-3 opacity-50">
