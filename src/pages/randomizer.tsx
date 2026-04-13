@@ -521,147 +521,119 @@ export default function Randomizer() {
   );
 
   return (
-    <div className="p-6 space-y-5 animate-slide-up">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-fuchsia-500/20 via-purple-500/15 to-cyan-500/20 border border-white/[0.08] shadow-[0_0_35px_rgba(168,85,247,0.18)]">
-            <Sparkles size={20} className="text-fuchsia-300" />
+    <div className="p-6 space-y-6 animate-slide-up">
+      <section className="relative overflow-hidden rounded-3xl border border-white/[0.09] bg-[radial-gradient(circle_at_15%_20%,rgba(200,155,60,0.18),transparent_40%),radial-gradient(circle_at_75%_10%,rgba(78,153,150,0.2),transparent_35%),linear-gradient(140deg,rgba(9,15,28,0.92),rgba(12,22,40,0.95))] p-5 md:p-6">
+        <div className="absolute -top-20 right-10 h-56 w-56 rounded-full bg-teal-400/10 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 left-4 h-56 w-56 rounded-full bg-gold/10 blur-3xl pointer-events-none" />
+        <div className="relative flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-start gap-3">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center border border-white/[0.1] bg-white/[0.04]">
+              <Sparkles size={20} className="text-gold" />
+            </div>
+            <div>
+              <h2 className="text-lg md:text-xl font-bold text-ink-bright">Loadout Randomizer</h2>
+              <p className="text-xs text-ink-muted max-w-[560px]">Keep your existing export logic, but spin a fresh champion, runes, spells, and build in a cleaner control surface.</p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-ink-bright">Randomizer</h2>
-            <p className="text-xs text-ink-muted">Roll a champion, full rune page, spell preference, and build export</p>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-2.5 py-1 rounded-full text-[10px] bg-white/[0.05] border border-white/[0.1] text-ink-ghost">{randomChampionCount} in pool</span>
+            <span className={`px-2.5 py-1 rounded-full text-[10px] border ${excludeMastery10Plus ? 'bg-gold/10 border-gold/30 text-gold' : 'bg-white/[0.05] border-white/[0.1] text-ink-ghost'}`}>
+              <Lock size={10} className="inline-block mr-1" /> M10+ {excludeMastery10Plus ? 'excluded' : 'included'}
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="px-2.5 py-1 rounded-full text-[10px] bg-white/[0.04] border border-white/[0.08] text-ink-ghost">{randomChampionCount} champion pool</span>
-          <span className={`px-2.5 py-1 rounded-full text-[10px] border ${excludeMastery10Plus ? 'bg-gold/10 border-gold/20 text-gold' : 'bg-white/[0.04] border-white/[0.08] text-ink-ghost'}`}>
-            <Lock size={10} className="inline-block mr-1" /> M10+ {excludeMastery10Plus ? 'excluded' : 'included'}
-          </span>
-        </div>
-      </div>
+      </section>
 
-      <div className="grid grid-cols-[1fr_1.15fr] gap-5">
-        <div className="space-y-5">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5">
+        <aside className="xl:col-span-4 space-y-5">
           <div className="card p-5 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-ink-bright">Randomization Options</h3>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-bold text-ink-bright">Control Deck</h3>
+                <p className="text-[10px] text-ink-ghost">Toggle what gets randomized before each roll</p>
+              </div>
               <button
                 onClick={randomizeAll}
                 disabled={loading || (!randomizeChampion && !randomizeRunes && !randomizeSpells && !randomizeBuild)}
-                className="px-4 py-2 rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-500 text-white font-semibold text-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-gold via-amber-500 to-teal-500 text-void font-semibold text-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Shuffle size={14} /> Roll All
               </button>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" checked={randomizeChampion} onChange={(e) => setRandomizeChampion(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-purple-500 checked:border-purple-500 cursor-pointer" />
-              <div className="flex items-center gap-2 flex-1">
-                <Swords size={14} className="text-purple-400" />
-                <span className="text-sm text-ink group-hover:text-ink-bright transition-colors">Random Champion</span>
-              </div>
+            <label className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 cursor-pointer">
+              <input type="checkbox" checked={randomizeChampion} onChange={(e) => setRandomizeChampion(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-teal-500 checked:border-teal-500 cursor-pointer" />
+              <Swords size={14} className="text-teal-300" />
+              <span className="text-sm text-ink">Random Champion</span>
             </label>
 
-            <div className="ml-7 pl-4 border-l-2 border-white/[0.08] space-y-2">
+            <div className="ml-7 pl-4 border-l border-white/[0.1] space-y-2">
               <label className="flex items-center gap-2 cursor-pointer text-xs text-ink-muted">
                 <input type="checkbox" checked={excludeMastery10Plus} onChange={(e) => setExcludeMastery10Plus(e.target.checked)} className="w-3.5 h-3.5 rounded border border-white/[0.1] bg-white/[0.05] checked:bg-gold checked:border-gold cursor-pointer" />
                 Exclude Mastery 10+ champions
               </label>
-              <p className="text-[10px] text-ink-ghost">Keeps high-mastery champions out of the random pool.</p>
+              <p className="text-[10px] text-ink-ghost">Keeps overplayed picks out of your roll pool.</p>
             </div>
 
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" checked={randomizeRunes} onChange={(e) => setRandomizeRunes(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-purple-500 checked:border-purple-500 cursor-pointer" />
-              <div className="flex items-center gap-2 flex-1">
-                <Flame size={14} className="text-orange-400" />
-                <span className="text-sm text-ink group-hover:text-ink-bright transition-colors">Full Rune Page</span>
-              </div>
+            <label className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 cursor-pointer">
+              <input type="checkbox" checked={randomizeRunes} onChange={(e) => setRandomizeRunes(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-orange-500 checked:border-orange-500 cursor-pointer" />
+              <Flame size={14} className="text-orange-300" />
+              <span className="text-sm text-ink">Full Rune Page</span>
             </label>
 
-            <div className="grid grid-cols-5 gap-2">
+            <label className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 cursor-pointer">
+              <input type="checkbox" checked={randomizeSpells} onChange={(e) => setRandomizeSpells(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-yellow-500 checked:border-yellow-500 cursor-pointer" />
+              <Zap size={14} className="text-yellow-300" />
+              <span className="text-sm text-ink">Summoner Spells</span>
+            </label>
+
+            {randomizeSpells && (
+              <div className="ml-7 pl-4 border-l border-white/[0.1] space-y-2">
+                <p className="text-[10px] text-ink-ghost">Flash key preference is used as the slot reference.</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button onClick={() => setFlashPosition('D')} className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'D' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.07] hover:bg-white/[0.06]'}`}>D Key</button>
+                  <button onClick={() => setFlashPosition('F')} className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'F' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.07] hover:bg-white/[0.06]'}`}>F Key</button>
+                </div>
+              </div>
+            )}
+
+            <label className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.02] px-3 py-2.5 cursor-pointer">
+              <input type="checkbox" checked={randomizeBuild} onChange={(e) => setRandomizeBuild(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-blue-500 checked:border-blue-500 cursor-pointer" />
+              <Package size={14} className="text-blue-300" />
+              <span className="text-sm text-ink">Build Path</span>
+            </label>
+          </div>
+
+          <div className="card p-5 space-y-3">
+            <h3 className="text-sm font-bold text-ink-bright">Rune Trees</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {RUNE_TREES.map((tree) => (
-                <div key={tree.id} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-2.5" style={{ boxShadow: `inset 0 1px 0 ${tree.accent}14` }}>
+                <div key={tree.id} className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-2.5" style={{ boxShadow: `inset 0 1px 0 ${tree.accent}22` }}>
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <div className="w-2 h-2 rounded-full" style={{ background: tree.accent }} />
                     <span className="text-[10px] font-semibold text-ink-bright">{tree.name}</span>
                   </div>
-                  <p className="text-[9px] text-ink-ghost leading-snug">{tree.tagline}</p>
+                  <p className="text-[10px] text-ink-ghost leading-snug">{tree.tagline}</p>
                 </div>
               ))}
             </div>
-
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" checked={randomizeSpells} onChange={(e) => setRandomizeSpells(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-purple-500 checked:border-purple-500 cursor-pointer" />
-              <div className="flex items-center gap-2 flex-1">
-                <Zap size={14} className="text-yellow-400" />
-                <span className="text-sm text-ink group-hover:text-ink-bright transition-colors">Flash Key Reference</span>
-              </div>
-            </label>
-
-            {randomizeSpells && (
-              <div className="ml-7 pl-4 border-l-2 border-white/[0.08] space-y-2">
-                <p className="text-[10px] text-ink-ghost">The preferred key is a placement reference only.</p>
-                <div className="flex gap-2">
-                  <button onClick={() => setFlashPosition('D')} className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'D' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.06] hover:bg-white/[0.06]'}`}>D Key</button>
-                  <button onClick={() => setFlashPosition('F')} className={`flex-1 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'F' ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.06] hover:bg-white/[0.06]'}`}>F Key</button>
-                </div>
-              </div>
-            )}
-
-            <label className="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" checked={randomizeBuild} onChange={(e) => setRandomizeBuild(e.target.checked)} className="w-4 h-4 rounded border-2 border-white/[0.1] bg-white/[0.05] checked:bg-purple-500 checked:border-purple-500 cursor-pointer" />
-              <div className="flex items-center gap-2 flex-1">
-                <Package size={14} className="text-blue-400" />
-                <span className="text-sm text-ink group-hover:text-ink-bright transition-colors">Build Path</span>
-              </div>
-            </label>
           </div>
+        </aside>
 
+        <section className="xl:col-span-8 space-y-5">
           <div className="card p-5 space-y-4">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h3 className="text-sm font-bold text-ink-bright">Champion Roll</h3>
-                <p className="text-[10px] text-ink-ghost">Filtered by your mastery pool</p>
+                <h3 className="text-sm font-bold text-ink-bright">Loadout Console</h3>
+                <p className="text-[10px] text-ink-ghost">One-click export to client with the current rolled setup</p>
               </div>
-              <button onClick={randomizeAll} className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-ink-bright hover:bg-white/[0.06] flex items-center gap-2">
-                <Shuffle size={12} /> Roll
-              </button>
-            </div>
-
-            {randomChampion ? (
-              <div className="rounded-2xl border border-white/[0.08] bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-4 flex items-center gap-4">
-                <img src={getChampionIconUrl(randomChampion.championId)} alt="" className="w-14 h-14 rounded-2xl object-cover border border-white/[0.08]" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.35'; }} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-base font-bold text-ink-bright truncate">{selectedChampionName}</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/20">M{randomChampion.championLevel ?? 0}</span>
-                  </div>
-                  <p className="text-xs text-ink-ghost">{excludeMastery10Plus ? 'M10+ filtered out of the roll' : 'All champions are eligible'}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-10 text-center text-ink-ghost">
-                <Swords size={34} className="mx-auto mb-3 opacity-20" />
-                <p className="text-sm text-ink-dim">Roll a champion to preview the loadout</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-5">
-          <div className="card p-5 space-y-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <h3 className="text-sm font-bold text-ink-bright">Results</h3>
-                <p className="text-[10px] text-ink-ghost">Full page, spell reference, and build path</p>
-              </div>
-              <div className={`px-2.5 py-1 rounded-full text-[10px] border ${feedback.kind === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' : feedback.kind === 'error' ? 'bg-ruby/10 text-ruby border-ruby/20' : feedback.kind === 'loading' ? 'bg-white/[0.04] text-ink-ghost border-white/[0.08]' : 'bg-white/[0.04] text-ink-ghost border-white/[0.08]'}`}>
+              <div className={`px-2.5 py-1 rounded-full text-[10px] border ${feedback.kind === 'success' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' : feedback.kind === 'error' ? 'bg-ruby/10 text-ruby border-ruby/30' : feedback.kind === 'loading' ? 'bg-white/[0.06] text-ink-ghost border-white/[0.1]' : 'bg-white/[0.04] text-ink-ghost border-white/[0.08]'}`}>
                 {feedback.text || (exporting ? 'Exporting…' : 'Ready')}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={exportEverything} disabled={loading || exporting || (!randomizeChampion && !randomizeRunes && !randomizeSpells && !randomizeBuild)} className="px-4 py-3 rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-500 text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button onClick={exportEverything} disabled={loading || exporting || (!randomizeChampion && !randomizeRunes && !randomizeSpells && !randomizeBuild)} className="px-4 py-3 rounded-xl bg-gradient-to-r from-gold via-amber-500 to-teal-500 text-void font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 {exporting ? <Loader2 size={15} className="animate-spin" /> : <Play size={15} />}
                 Export to Client
               </button>
@@ -683,118 +655,152 @@ export default function Randomizer() {
             </div>
           </div>
 
-          <div className="card p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <Flame size={14} className="text-orange-400" />
-              <h3 className="text-sm font-bold text-ink-bright">Rune Page</h3>
-            </div>
-            {runeTemplate ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-                    <div className="text-[10px] text-ink-ghost mb-1">Primary</div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: runeTreeById.get(runeTemplate.primaryStyleId)?.accent ?? '#fff' }} />
-                      <span className="text-sm font-semibold text-ink-bright">{runeTreeById.get(runeTemplate.primaryStyleId)?.name ?? 'Unknown'}</span>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="card p-5 space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-ink-bright">Champion Spotlight</h3>
+                  <p className="text-[10px] text-ink-ghost">Pulled from your mastery pool</p>
+                </div>
+                <button onClick={randomizeAll} className="px-3 py-2 rounded-lg bg-white/[0.04] border border-white/[0.08] text-xs text-ink-bright hover:bg-white/[0.06] flex items-center gap-2">
+                  <Shuffle size={12} /> Roll
+                </button>
+              </div>
+
+              {randomChampion ? (
+                <div className="rounded-2xl border border-white/[0.08] bg-[linear-gradient(120deg,rgba(16,148,135,0.15),rgba(200,155,60,0.08),rgba(0,0,0,0.15))] p-4 flex items-center gap-4">
+                  <img src={getChampionIconUrl(randomChampion.championId)} alt="" className="w-16 h-16 rounded-2xl object-cover border border-white/[0.08]" onError={(e) => { (e.target as HTMLImageElement).style.opacity = '0.35'; }} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-base font-bold text-ink-bright truncate">{selectedChampionName}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/20">M{randomChampion.championLevel ?? 0}</span>
                     </div>
-                  </div>
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-                    <div className="text-[10px] text-ink-ghost mb-1">Secondary</div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: runeTreeById.get(runeTemplate.subStyleId)?.accent ?? '#fff' }} />
-                      <span className="text-sm font-semibold text-ink-bright">{runeTreeById.get(runeTemplate.subStyleId)?.name ?? 'Unknown'}</span>
-                    </div>
+                    <p className="text-xs text-ink-ghost">{excludeMastery10Plus ? 'M10+ champions excluded from roll' : 'All mastery champions are eligible'}</p>
                   </div>
                 </div>
+              ) : (
+                <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-10 text-center text-ink-ghost">
+                  <Swords size={34} className="mx-auto mb-3 opacity-20" />
+                  <p className="text-sm text-ink-dim">Roll a champion to fill this panel</p>
+                </div>
+              )}
+            </div>
 
-                <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-                  <div className="flex items-center justify-between mb-2">
+            <div className="card p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Zap size={14} className="text-yellow-300" />
+                <h3 className="text-sm font-bold text-ink-bright">Summoner Spells</h3>
+              </div>
+              {randomSpells ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                      <p className="text-[10px] text-ink-ghost mb-1">Preferred {flashPosition} slot</p>
+                      <p className="text-sm font-semibold text-ink-bright">{randomSpells.first.name}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                      <p className="text-[10px] text-ink-ghost mb-1">Second slot</p>
+                      <p className="text-sm font-semibold text-ink-bright">{randomSpells.second.name}</p>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-ink-ghost">{randomSpells.flashReference}</p>
+                </>
+              ) : (
+                <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center text-ink-ghost">
+                  <Zap size={24} className="mx-auto mb-2 opacity-20" />
+                  <p className="text-sm text-ink-dim">Roll summoner spells to populate this area</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="card p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Flame size={14} className="text-orange-300" />
+                <h3 className="text-sm font-bold text-ink-bright">Rune Blueprint</h3>
+              </div>
+              {runeTemplate ? (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                      <div className="text-[10px] text-ink-ghost mb-1">Primary</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ background: runeTreeById.get(runeTemplate.primaryStyleId)?.accent ?? '#fff' }} />
+                        <span className="text-sm font-semibold text-ink-bright">{runeTreeById.get(runeTemplate.primaryStyleId)?.name ?? 'Unknown'}</span>
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                      <div className="text-[10px] text-ink-ghost mb-1">Secondary</div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2.5 h-2.5 rounded-full" style={{ background: runeTreeById.get(runeTemplate.subStyleId)?.accent ?? '#fff' }} />
+                        <span className="text-sm font-semibold text-ink-bright">{runeTreeById.get(runeTemplate.subStyleId)?.name ?? 'Unknown'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <p className="text-xs font-semibold text-ink-bright">{runeTemplate.name}</p>
+                        <p className="text-[10px] text-ink-ghost">{runeTemplate.highlight}</p>
+                      </div>
+                      <span className="text-[10px] px-2 py-1 rounded-full bg-orange-500/10 text-orange-200 border border-orange-500/20">{runeTemplate.selectedPerkIds.length} perks</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {runeTemplate.selectedPerkIds.map((perkId, index) => (
+                        <span key={`${perkId}-${index}`} className="px-2 py-1 rounded-full text-[10px] bg-white/[0.04] border border-white/[0.08] text-ink-ghost">#{perkId}</span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-8 text-center text-ink-ghost">
+                  <Flame size={28} className="mx-auto mb-2 opacity-20" />
+                  <p className="text-sm text-ink-dim">Roll a rune page to populate this area</p>
+                </div>
+              )}
+            </div>
+
+            <div className="card p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <Package size={14} className="text-blue-300" />
+                <h3 className="text-sm font-bold text-ink-bright">Build Path</h3>
+              </div>
+              {buildTemplate ? (
+                <>
+                  <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="text-xs font-semibold text-ink-bright">{runeTemplate.name}</p>
-                      <p className="text-[10px] text-ink-ghost">{runeTemplate.highlight}</p>
+                      <p className="text-sm font-semibold text-ink-bright">{buildTemplate.name}</p>
+                      <p className="text-[10px] text-ink-ghost">{buildTemplate.note}</p>
                     </div>
-                    <span className="text-[10px] px-2 py-1 rounded-full bg-fuchsia-500/10 text-fuchsia-200 border border-fuchsia-500/20">{runeTemplate.selectedPerkIds.length} perks</span>
+                    <span className="text-[10px] px-2 py-1 rounded-full bg-blue-500/10 text-blue-200 border border-blue-500/20">{buildTemplate.role}</span>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {runeTemplate.selectedPerkIds.map((perkId, index) => (
-                      <span key={`${perkId}-${index}`} className="px-2 py-1 rounded-full text-[10px] bg-white/[0.04] border border-white/[0.08] text-ink-ghost">#{perkId}</span>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-8 text-center text-ink-ghost">
-                <Flame size={28} className="mx-auto mb-2 opacity-20" />
-                <p className="text-sm text-ink-dim">Roll a rune page to populate this area</p>
-              </div>
-            )}
-          </div>
 
-          <div className="card p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <Zap size={14} className="text-yellow-400" />
-              <h3 className="text-sm font-bold text-ink-bright">Summoner Spells</h3>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Starting</div>
+                      {renderItemRow(buildTemplate.startingItems, true)}
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Core</div>
+                      {renderItemRow(buildTemplate.coreItems)}
+                    </div>
+                    <div>
+                      <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Situational</div>
+                      {renderItemRow(buildTemplate.situationalItems, true)}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center text-ink-ghost">
+                  <Package size={24} className="mx-auto mb-2 opacity-20" />
+                  <p className="text-sm text-ink-dim">Roll a build path to populate this area</p>
+                </div>
+              )}
             </div>
-            {randomSpells ? (
-              <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-                    <p className="text-[10px] text-ink-ghost mb-1">{flashPosition} key preference</p>
-                    <p className="text-sm font-semibold text-ink-bright">{randomSpells.first.name}</p>
-                  </div>
-                  <div className="rounded-xl border border-white/[0.08] bg-white/[0.03] p-3">
-                    <p className="text-[10px] text-ink-ghost mb-1">Other slot</p>
-                    <p className="text-sm font-semibold text-ink-bright">{randomSpells.second.name}</p>
-                  </div>
-                </div>
-                <p className="text-[10px] text-ink-ghost">{randomSpells.flashReference}</p>
-              </>
-            ) : (
-              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center text-ink-ghost">
-                <Zap size={24} className="mx-auto mb-2 opacity-20" />
-                <p className="text-sm text-ink-dim">Roll summoner spells to populate this area</p>
-              </div>
-            )}
           </div>
-
-          <div className="card p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <Package size={14} className="text-blue-400" />
-              <h3 className="text-sm font-bold text-ink-bright">Build Path</h3>
-            </div>
-            {buildTemplate ? (
-              <>
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-ink-bright">{buildTemplate.name}</p>
-                    <p className="text-[10px] text-ink-ghost">{buildTemplate.note}</p>
-                  </div>
-                  <span className="text-[10px] px-2 py-1 rounded-full bg-blue-500/10 text-blue-200 border border-blue-500/20">{buildTemplate.role}</span>
-                </div>
-
-                <div className="space-y-2">
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Starting</div>
-                    {renderItemRow(buildTemplate.startingItems, true)}
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Core</div>
-                    {renderItemRow(buildTemplate.coreItems)}
-                  </div>
-                  <div>
-                    <div className="text-[10px] uppercase tracking-wider text-ink-ghost mb-1">Situational</div>
-                    {renderItemRow(buildTemplate.situationalItems, true)}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-6 text-center text-ink-ghost">
-                <Package size={24} className="mx-auto mb-2 opacity-20" />
-                <p className="text-sm text-ink-dim">Roll a build path to populate this area</p>
-              </div>
-            )}
-          </div>
-        </div>
+        </section>
       </div>
     </div>
   );
