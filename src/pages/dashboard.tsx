@@ -187,6 +187,22 @@ function getChallengeId(c: any): number {
 const CLASSES = ['Assassin', 'Fighter', 'Mage', 'Marksman', 'Support', 'Tank'];
 const TIER_NAMES = ['Iron', 'Bronze', 'Silver', 'Gold', 'Plat', 'Dia', 'Master'];
 const TIER_COLORS = [TIER_C.IRON, TIER_C.BRONZE, TIER_C.SILVER, TIER_C.GOLD, TIER_C.PLATINUM, TIER_C.DIAMOND, TIER_C.MASTER];
+const CLASS_CHALLENGE_TOKEN_IDS: Record<string, number> = {
+    Assassin: 401201,
+    Fighter: 401202,
+    Mage: 401203,
+    Marksman: 401204,
+    Support: 401205,
+    Tank: 401206,
+};
+const CLASS_CHALLENGE_PROGRESS_IDS: Record<string, number[]> = {
+    Assassin: [401207, 401201],
+    Fighter: [401208, 401202],
+    Mage: [401209, 401203],
+    Marksman: [401210, 401204],
+    Support: [401211, 401205],
+    Tank: [401212, 401206],
+};
 
 function MasteryClassPanel({ classData }: { classData: { name: string; m7: number; m10: number }[] }) {
     const BAR_H = 180;
@@ -243,8 +259,12 @@ function MasteryClassPanel({ classData }: { classData: { name: string; m7: numbe
                                 style={{ height: `${pct7}%`, background: `linear-gradient(0deg, ${barColor}AA, ${barColor})` }} />
                         </div>
 
-                        {/* Emblem + label */}
-                        <Emblem tier={cur?.tier ?? 'None'} size={16} />
+                        {/* Challenge token + label */}
+                        <ChallengeTokenIcon
+                            challengeId={CLASS_CHALLENGE_TOKEN_IDS[cls.name] ?? 0}
+                            tier={cur?.tier ?? 'None'}
+                            size={16}
+                        />
                         <span className="text-sm text-ink font-medium text-center leading-tight">{cls.name}</span>
 
                         {/* Hover tooltip - fixed positioning */}
@@ -990,11 +1010,20 @@ export default function Dashboard() {
         });
     }, []);
 
-    const classData = CLASSES.map((name, i) => ({
-        name,
-        m7: masteries.filter(m => (m.championId % CLASSES.length) === i && (m.championLevel ?? 0) >= 7).length,
-        m10: masteries.filter(m => (m.championId % CLASSES.length) === i && (m.championLevel ?? 0) >= 10).length,
-    }));
+    const classData = useMemo(() => CLASSES.map((name) => {
+        const ids = CLASS_CHALLENGE_PROGRESS_IDS[name] ?? [];
+        const challengeById = new Map<number, any>(
+            challenges.map(c => [Number(c?.id ?? c?.challengeId), c])
+        );
+        const challenge = ids.map(id => challengeById.get(id)).find(Boolean);
+        const current = Math.floor(Number(challenge?.currentValue ?? 0));
+        const next = Math.floor(Number(challenge?.nextThreshold ?? challenge?.nextLevelValue ?? 0));
+        return {
+            name,
+            m7: Number.isFinite(current) ? current : 0,
+            m10: Number.isFinite(next) ? next : 0,
+        };
+    }), [challenges]);
 
     const filteredMasteries = useMemo(() => {
         if (champFilter === 'hideM10') return masteries.filter(m => (m.championLevel ?? 0) < 10);
