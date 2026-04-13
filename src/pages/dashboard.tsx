@@ -30,6 +30,24 @@ const TIER_C: Record<string, string> = {
     MASTER: '#9D48E0', GRANDMASTER: '#E84057', CHALLENGER: '#F4C874',
 };
 
+const TIER_ALIASES: Record<string, keyof typeof TIER_C> = {
+    N: 'NONE', NONE: 'NONE',
+    I: 'IRON', IRON: 'IRON',
+    B: 'BRONZE', BRONZE: 'BRONZE',
+    S: 'SILVER', SILVER: 'SILVER',
+    G: 'GOLD', GOLD: 'GOLD',
+    P: 'PLATINUM', PLAT: 'PLATINUM', PLATINUM: 'PLATINUM',
+    D: 'DIAMOND', DIA: 'DIAMOND', DIAMOND: 'DIAMOND',
+    M: 'MASTER', MASTER: 'MASTER',
+    GM: 'GRANDMASTER', GRANDMASTER: 'GRANDMASTER',
+    C: 'CHALLENGER', CHALL: 'CHALLENGER', CHALLENGER: 'CHALLENGER',
+};
+
+function normalizeTier(tier: unknown): keyof typeof TIER_C {
+    const key = String(tier ?? 'NONE').trim().toUpperCase();
+    return TIER_ALIASES[key] ?? 'NONE';
+}
+
 // Class-specific tier thresholds (from Riot's Mastery Class Challenges)
 const CLASS_THRESHOLDS: Record<string, { tier: string; min: number; color: string }[]> = {
     Assassin: [
@@ -124,20 +142,45 @@ function getCurrentTier(count: number, className: string) {
 
 // Emblem image
 function Emblem({ tier, size = 18 }: { tier: string; size?: number }) {
-    const key = ({ PLAT: 'platinum', DIA: 'diamond', GM: 'grandmaster', CHALL: 'challenger' } as Record<string, string>)[tier.toUpperCase()] ?? tier.toLowerCase();
-    const color = TIER_C[tier.toUpperCase()] ?? TIER_C.NONE;
+    const normalizedTier = normalizeTier(tier);
+    const key = normalizedTier.toLowerCase();
+    const color = TIER_C[normalizedTier] ?? TIER_C.NONE;
     const [failed, setFailed] = useState(false);
     if (failed) return (
         <div className="rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
             style={{ width: size, height: size, background: `${color}20`, border: `1px solid ${color}40`, color }}>
-            {tier.charAt(0).toUpperCase()}
+            {normalizedTier.charAt(0).toUpperCase()}
         </div>
     );
     return (
         <img src={`https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-shared-components/global/default/ranked-emblem/emblem-${key}.png`}
-            alt={tier} style={{ width: size, height: size }} className="object-contain flex-shrink-0"
+            alt={normalizedTier} style={{ width: size, height: size }} className="object-contain flex-shrink-0"
             onError={() => setFailed(true)} />
     );
+}
+
+function ChallengeTokenIcon({ challengeId, tier, size = 18 }: { challengeId: number; tier: string; size?: number }) {
+    const normalizedTier = normalizeTier(tier);
+    const [failed, setFailed] = useState(false);
+
+    if (failed || !Number.isFinite(challengeId) || challengeId <= 0) {
+        return <Emblem tier={normalizedTier} size={size} />;
+    }
+
+    return (
+        <img
+            src={`https://raw.communitydragon.org/latest/game/assets/challenges/config/${challengeId}/tokens/${normalizedTier.toLowerCase()}.png`}
+            alt={normalizedTier}
+            style={{ width: size, height: size, opacity: normalizedTier === 'NONE' ? 0.4 : 1 }}
+            className="object-contain flex-shrink-0"
+            onError={() => setFailed(true)}
+        />
+    );
+}
+
+function getChallengeId(c: any): number {
+    const id = c?.id ?? c?.challengeId;
+    return typeof id === 'number' ? id : Number(id);
 }
 
 // ── Shared-box mastery class bars ────────────────────────────────────────────
@@ -240,7 +283,8 @@ function MasteryClassPanel({ classData }: { classData: { name: string; m7: numbe
 // ── Challenge row ────────────────────────────────────────────────────────────
 function ChallengeRow({ c }: { c: any }) {
     const [tip, setTip] = useState(false);
-    const tier = (c.currentLevel ?? c.level ?? 'NONE').toUpperCase();
+    const challengeId = getChallengeId(c);
+    const tier = normalizeTier(c.currentLevel ?? c.level);
     const cur = c.currentValue ?? 0;
     const next = c.nextLevelValue ?? c.nextThreshold ?? 0;
     const prev = c.previousLevelValue ?? 0;
@@ -251,7 +295,7 @@ function ChallengeRow({ c }: { c: any }) {
     return (
         <div className="relative flex items-center gap-2.5 py-2 px-2 rounded-lg hover:bg-white/[0.02] transition-colors"
             onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
-            <Emblem tier={tier} size={20} />
+            <ChallengeTokenIcon challengeId={challengeId} tier={tier} size={20} />
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                     <span className="text-xs font-medium text-ink-bright truncate pr-2">{c.name ?? `#${c.id}`}</span>
@@ -296,10 +340,11 @@ function ChampionRow({ m, rank }: { m: any; rank: number }) {
 // ── Almost There row ─────────────────────────────────────────────────────────
 function AlmostThereRow({ c, tier, color, cur, next, pct }: { c: any; tier: string; color: string; cur: number; next: number; pct: number }) {
     const [tip, setTip] = useState(false);
+    const challengeId = getChallengeId(c);
     return (
         <div className="relative flex items-center gap-2 p-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
             onMouseEnter={() => setTip(true)} onMouseLeave={() => setTip(false)}>
-            <Emblem tier={tier} size={18} />
+            <ChallengeTokenIcon challengeId={challengeId} tier={tier} size={18} />
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                     <span className="text-xs font-medium text-ink-bright truncate">{c.name ?? `#${c.id}`}</span>
@@ -967,7 +1012,7 @@ export default function Dashboard() {
         challenges
             .filter(c => {
                 const next = c.nextLevelValue ?? c.nextThreshold ?? 0;
-                const tier = (c.currentLevel ?? '').toUpperCase();
+                const tier = normalizeTier(c.currentLevel);
                 const isCapstone = c.isCapstone || (c.name ?? '').toLowerCase().includes('capstone') || (c.category ?? '').toLowerCase().includes('capstone');
                 return next > 0 && (c.currentValue ?? 0) < next && !['MASTER', 'GRANDMASTER', 'CHALLENGER'].includes(tier) && !isCapstone;
             })
@@ -1022,7 +1067,7 @@ export default function Dashboard() {
                             ) : (
                                 <div className="space-y-2">
                                     {closest3.map((c, i) => {
-                                        const tier = (c.currentLevel ?? 'NONE').toUpperCase();
+                                        const tier = normalizeTier(c.currentLevel);
                                         const color = TIER_C[tier] ?? TIER_C.NONE;
                                         const cur = c.currentValue ?? 0;
                                         const next = c.nextLevelValue ?? c.nextThreshold ?? 0;
@@ -1080,7 +1125,8 @@ export default function Dashboard() {
 
 // Compact challenge row for sidebar - with token display for mastery challenges
 function ChallengeRowCompact({ c }: { c: any }) {
-    const tier = (c.currentLevel ?? c.level ?? 'NONE').toUpperCase();
+    const challengeId = getChallengeId(c);
+    const tier = normalizeTier(c.currentLevel ?? c.level);
     const cur = c.currentValue ?? 0;
     const next = c.nextLevelValue ?? c.nextThreshold ?? 0;
     const prev = c.previousLevelValue ?? 0;
@@ -1093,7 +1139,7 @@ function ChallengeRowCompact({ c }: { c: any }) {
 
     return (
         <div className="flex items-center gap-2 py-1.5">
-            <Emblem tier={tier} size={16} />
+            <ChallengeTokenIcon challengeId={challengeId} tier={tier} size={16} />
             <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-0.5">
                     <span className="text-xs font-medium text-ink-bright truncate pr-1">{c.name ?? `#${c.id}`}</span>
