@@ -45,9 +45,46 @@ function getChampionName(championId: number): string {
   return championNames[championId] ?? `Champion #${championId}`;
 }
 
+async function loadChampionNameById(championId: number): Promise<string | null> {
+  if (!Number.isFinite(championId) || championId <= 0) return null;
+
+  try {
+    const res = await fetch(`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champions/${championId}.json`);
+    if (res.ok) {
+      const data = await res.json();
+      const name = typeof data?.name === 'string' ? data.name : null;
+      if (name) {
+        championNames[championId] = name;
+        return name;
+      }
+    }
+  } catch {
+    // Ignore and try LCU fallback.
+  }
+
+  try {
+    const localRes = await lcuRequest({ method: 'GET', endpoint: `/lol-game-data/assets/v1/champions/${championId}.json` });
+    if (localRes.status >= 200 && localRes.status < 300 && localRes.body) {
+      const data = JSON.parse(localRes.body);
+      const name = typeof data?.name === 'string' ? data.name : null;
+      if (name) {
+        championNames[championId] = name;
+        return name;
+      }
+    }
+  } catch {
+    // Ignore and return unresolved.
+  }
+
+  return null;
+}
+
 async function getChampionNameResolved(championId: number): Promise<string> {
   if (championNames[championId]) return championNames[championId];
   await loadChampionNames();
+  if (!championNames[championId]) {
+    await loadChampionNameById(championId);
+  }
   return championNames[championId] ?? `Champion #${championId}`;
 }
 
@@ -297,6 +334,16 @@ export default function Randomizer() {
       }
     }).catch(() => undefined);
   }, []);
+
+  useEffect(() => {
+    const championId = Number(randomChampion?.championId);
+    if (!Number.isFinite(championId) || championId <= 0) return;
+    if (championNames[championId]) return;
+
+    getChampionNameResolved(championId)
+      .then(() => setNamesLoadedTick((v) => v + 1))
+      .catch(() => undefined);
+  }, [randomChampion]);
 
   const eligibleMasteries = useMemo(() => {
     const pool = excludeMastery10Plus
