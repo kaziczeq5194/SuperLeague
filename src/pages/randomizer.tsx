@@ -1153,7 +1153,7 @@ export default function Randomizer() {
                 <button onClick={() => setFlashPosition('D')} className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'D' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.07] hover:bg-white/[0.06]'}`}>Flash Preference: D</button>
                 <button onClick={() => setFlashPosition('F')} className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${flashPosition === 'F' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' : 'bg-white/[0.03] text-ink-ghost border border-white/[0.07] hover:bg-white/[0.06]'}`}>Flash Preference: F</button>
               </div>
-              <p className="text-[11px] text-ink-ghost px-1">If Flash is not rolled, key spells (Smite/Teleport/Ignite/Exhaust) are placed opposite your flash preference.</p>
+              <p className="text-[11px] text-ink-ghost px-1">If Flash is not rolled, key spells (Smite/Teleport/Ignite/Exhaust) are placed opposite to your flash preference.</p>
             </>
           )}
 
