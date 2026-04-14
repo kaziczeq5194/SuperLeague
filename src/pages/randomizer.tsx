@@ -152,7 +152,7 @@ const BUILD_TEMPLATES: BuildTemplate[] = [
   { name: 'AD Carry', role: 'Marksman', note: 'Crit and attack speed', startingItems: [1055, 2003], coreItems: [3006, 3031, 6672, 3095, 3036, 3085], situationalItems: [3153, 3124] },
   { name: 'AP Carry', role: 'Mage', note: 'Burst and scaling damage', startingItems: [1056, 2003], coreItems: [3020, 6656, 3089, 4645, 3135, 3157], situationalItems: [3158, 3165] },
   { name: 'Tank', role: 'Tank', note: 'Front line and soak', startingItems: [1054, 2003], coreItems: [3047, 3068, 3009, 3075, 6664, 3065], situationalItems: [3110, 3193] },
-  { name: 'Bruiser', role: 'Fighter', note: 'Sustained skirmish', startingItems: [1055, 2031], coreItems: [3111, 3078, 6630, 3053, 3044, 3748], situationalItems: [3074, 6333] },
+  { name: 'Bruiser', role: 'Fighter', note: 'Sustained skirmish', startingItems: [1055, 2031], coreItems: [3111, 3078, 6333, 3053, 3044, 3748], situationalItems: [3074, 3071] },
   { name: 'Assassin', role: 'Assassin', note: 'Pick tools and lethality', startingItems: [1036, 3340], coreItems: [3009, 6692, 3142, 3071, 3814, 3158], situationalItems: [3147, 6693] },
   { name: 'Support', role: 'Support', note: 'Utility and team enablement', startingItems: [3850, 2003], coreItems: [3117, 6617, 6616, 3190, 3222, 3107], situationalItems: [3050, 4005] },
   { name: 'On-Hit', role: 'Marksman', note: 'Mixed damage and shred', startingItems: [1055, 2003], coreItems: [3020, 3153, 3124, 6672, 3085, 3036], situationalItems: [3031, 3115] },
@@ -161,7 +161,7 @@ const BUILD_TEMPLATES: BuildTemplate[] = [
   { name: 'Hybrid', role: 'Mage', note: 'Flexible damage and utility', startingItems: [1056, 2003], coreItems: [3047, 3115, 3089, 3157, 3135, 4629], situationalItems: [4645, 6656] },
   { name: 'Poke Mage', role: 'Mage', note: 'Long range poke and haste', startingItems: [1056, 2003], coreItems: [3020, 6655, 4645, 4629, 3135, 3157], situationalItems: [3089, 3102] },
   { name: 'Drain Mage', role: 'Mage', note: 'Sustain and extended fights', startingItems: [1056, 2003], coreItems: [3047, 6653, 3157, 4637, 4645, 3135], situationalItems: [4628, 3020] },
-  { name: 'Split Fighter', role: 'Fighter', note: 'Side lane pressure', startingItems: [1055, 2003], coreItems: [3111, 6632, 3071, 3053, 3074, 6333], situationalItems: [3748, 3047] },
+  { name: 'Split Fighter', role: 'Fighter', note: 'Side lane pressure', startingItems: [1055, 2003], coreItems: [3111, 3078, 3071, 3053, 3074, 6333], situationalItems: [3748, 3047] },
   { name: 'Warden Tank', role: 'Tank', note: 'Peel and engage', startingItems: [1054, 2003], coreItems: [3009, 3111, 3068, 3193, 3109, 3075], situationalItems: [3065, 4401] },
   { name: 'Enchanter Utility', role: 'Support', note: 'Shields and haste utility', startingItems: [3850, 2003], coreItems: [3117, 6616, 6617, 3107, 3504, 4005], situationalItems: [3222, 3050] },
   { name: 'Engage Support', role: 'Support', note: 'Initiation and lockdown', startingItems: [3867, 2003], coreItems: [3050, 3190, 3117, 3109, 3107, 3009], situationalItems: [3110, 4401] },
@@ -172,12 +172,13 @@ const BUILD_TEMPLATES: BuildTemplate[] = [
 ];
 
 const BOOTS_POOL = [3006, 3020, 3047, 3111, 3009, 3117, 3158];
+const LEGENDARY_BLACKLIST = new Set([6630, 6631, 6632]);
 
 const LEGENDARY_POOLS = {
-  AP: [3089, 3135, 3157, 3165, 4628, 4629, 4633, 4645, 6653, 6655, 6656],
-  AD: [3031, 3036, 3072, 3085, 3094, 3124, 3153, 3508, 6672, 6675, 6676, 6694],
-  TANK: [3065, 3068, 3075, 3083, 3109, 3110, 3143, 3193, 3742, 4401, 6662, 6664],
-  ASSASSIN: [3142, 3147, 3179, 3814, 6692, 6693, 6695, 6676, 3071, 3033],
+  AP: [3041, 3089, 3102, 3115, 3116, 3135, 3152, 3157, 3165, 4628, 4629, 4633, 4645, 6653, 6655, 6656],
+  AD: [3004, 3026, 3031, 3033, 3036, 3053, 3071, 3072, 3074, 3078, 3085, 3091, 3094, 3095, 3124, 3139, 3153, 3161, 3181, 3302, 3508, 3742, 3748, 6333, 6609, 6610, 6631, 6672, 6673, 6675, 6676],
+  TANK: [3050, 3065, 3068, 3075, 3083, 3109, 3110, 3143, 3190, 3193, 3742, 3748, 4401, 6662, 6664],
+  ASSASSIN: [3004, 3026, 3071, 3142, 3147, 3156, 3179, 3814, 6676, 6692, 6693, 6694, 6695, 6696, 6697, 6698, 6699, 6701],
 };
 
 type ChaosArchetype = 'AP' | 'AD' | 'TANK' | 'ASSASSIN' | 'ANY';
@@ -265,7 +266,7 @@ function buildLegendaryPath(role: PlayerRole, isAdcRole: boolean, archetype?: Ch
 
   // Pick boots first - ensure no boots in legendary pool
   const boot = pickOne(BOOTS_POOL);
-  const bootFilteredPool = legendaryPool.filter((id) => !BOOTS_POOL.includes(id));
+  const bootFilteredPool = legendaryPool.filter((id) => !BOOTS_POOL.includes(id) && !LEGENDARY_BLACKLIST.has(id));
   
   // Pick the correct number of legendaries: 5 for non-ADC, 6 for ADC
   const itemCount = isAdcRole ? 6 : 5;
